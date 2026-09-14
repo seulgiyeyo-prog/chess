@@ -1,0 +1,6 @@
+{
+  "name": "수학 체스 (Math Chess)",
+  "description": "수학시간에 즐기는 대형 체스판 게임: AI 대전 및 1:1 대결, 참가자 이름 설정, 착수 사운드, 실시간 랭킹 시스템",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
