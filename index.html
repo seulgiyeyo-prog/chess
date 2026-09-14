@@ -39,15 +39,25 @@
         console.error('Captured Global Error:', msg);
         var r = document.getElementById('root');
         if (r && (!r.querySelector('main') && !r.querySelector('header'))) {
+          var isSourceMainTsx = String(msg || '').indexOf('src/main.tsx') !== -1;
+          var guidance = isSourceMainTsx
+            ? '<div style="background:#27272a;border-left:4px solid #f59e0b;padding:12px;margin:12px 0 16px;text-align:left;border-radius:4px;font-size:13px;line-height:1.6;color:#e4e4e7;">' +
+              '<strong>💡 해결 방법 (GitHub Pages 설정 1단계):</strong><br/>' +
+              'GitHub 저장소의 <strong>[Settings]</strong> &rarr; 좌측 <strong>[Pages]</strong> 메뉴에서<br/>' +
+              '<strong>Build and deployment &gt; Source</strong>를<br/>' +
+              '<span style="color:#f87171;text-decoration:line-through;">Deploy from a branch</span> 대신 <strong><span style="color:#34d399;">GitHub Actions</span></strong>로 변경해 주시면 빌드된 최신 체스 앱이 즉시 실행됩니다!' +
+              '</div>'
+            : '<p style="font-size:13px;color:#a1a1aa;margin:0 0 16px 0;line-height:1.5;">브라우저 자바스크립트 로딩 또는 저장소 캐시 충돌이 감지되었습니다.</p>';
+
           r.innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#18181b;color:#f4f4f5;padding:24px;text-align:center;">' +
-            '<div style="background:#27272a;border:1px solid #3f3f46;border-radius:18px;max-width:440px;width:100%;padding:28px;box-shadow:0 20px 40px rgba(0,0,0,0.6);">' +
-            '<div style="font-size:36px;margin-bottom:12px;">⚠️</div>' +
-            '<h2 style="font-size:17px;font-weight:700;margin:0 0 8px 0;color:#fff;">체스 앱 실행 중 문제가 발생했습니다</h2>' +
-            '<p style="font-size:13px;color:#a1a1aa;margin:0 0 16px 0;line-height:1.5;">브라우저 자바스크립트 로딩 또는 저장소 캐시 충돌이 감지되었습니다.</p>' +
+            '<div style="background:#27272a;border:1px solid #3f3f46;border-radius:18px;max-width:480px;width:100%;padding:28px;box-shadow:0 20px 40px rgba(0,0,0,0.6);">' +
+            '<div style="font-size:36px;margin-bottom:12px;">♟️</div>' +
+            '<h2 style="font-size:17px;font-weight:700;margin:0 0 8px 0;color:#fff;">체스 앱 배포 설정이 필요합니다</h2>' +
+            guidance +
             '<div style="background:#18181b;color:#f87171;padding:12px;border-radius:10px;font-family:monospace;font-size:12px;word-break:break-all;text-align:left;margin-bottom:20px;border:1px solid #3f3f46;">' +
             String(msg || '알 수 없는 로딩 오류') + '</div>' +
             '<button onclick="try{localStorage.clear();sessionStorage.clear();}catch(e){}location.reload();" style="background:#d97706;color:#fff;border:none;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;width:100%;">' +
-            '데이터 리셋 후 새로고침</button>' +
+            '새로고침</button>' +
             '</div></div>';
         }
       }
