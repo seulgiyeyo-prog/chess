@@ -14,27 +14,44 @@ export function getRankings(): PlayerRanking[] {
   if (typeof window === 'undefined') return [];
   try {
     // Clear legacy v1 mock seeds if present
-    if (localStorage.getItem('math_chess_rankings_v1')) {
-      localStorage.removeItem('math_chess_rankings_v1');
-      localStorage.removeItem('math_chess_matches_v1');
-    }
+    try {
+      if (localStorage.getItem('math_chess_rankings_v1')) {
+        localStorage.removeItem('math_chess_rankings_v1');
+        localStorage.removeItem('math_chess_matches_v1');
+      }
+    } catch {}
 
     const raw = localStorage.getItem(RANKING_STORAGE_KEY);
     if (!raw) {
-      localStorage.setItem(RANKING_STORAGE_KEY, JSON.stringify([]));
+      try {
+        localStorage.setItem(RANKING_STORAGE_KEY, JSON.stringify([]));
+      } catch {}
       return [];
     }
 
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
 
-    // Filter out any legacy dummy seeds if they ever got stored
-    const cleaned = parsed.filter((p: PlayerRanking) => !p.id?.startsWith('seed-'));
-    if (cleaned.length !== parsed.length) {
-      localStorage.setItem(RANKING_STORAGE_KEY, JSON.stringify(cleaned));
+    // Filter and sanitize all players
+    const sanitized: PlayerRanking[] = [];
+    for (const p of parsed) {
+      if (!p || typeof p !== 'object') continue;
+      const idStr = String(p.id || '');
+      if (idStr.startsWith('seed-')) continue;
+      sanitized.push({
+        id: idStr || 'p-' + Math.random().toString(36).substring(2, 8),
+        name: String(p.name || '참가자'),
+        rating: typeof p.rating === 'number' && !isNaN(p.rating) ? p.rating : 1200,
+        wins: Number(p.wins) || 0,
+        losses: Number(p.losses) || 0,
+        draws: Number(p.draws) || 0,
+        totalGames: Number(p.totalGames) || 0,
+        winStreak: Number(p.winStreak) || 0,
+        lastPlayed: Number(p.lastPlayed) || Date.now(),
+      });
     }
 
-    return cleaned.sort((a, b) => b.rating - a.rating);
+    return sanitized.sort((a, b) => b.rating - a.rating);
   } catch {
     return [];
   }
@@ -193,10 +210,12 @@ export function recordGameResult(params: {
  */
 export function resetLeaderboard(): PlayerRanking[] {
   if (typeof window !== 'undefined') {
-    localStorage.setItem(RANKING_STORAGE_KEY, JSON.stringify([]));
-    localStorage.removeItem(MATCH_STORAGE_KEY);
-    localStorage.removeItem('math_chess_rankings_v1');
-    localStorage.removeItem('math_chess_matches_v1');
+    try {
+      localStorage.setItem(RANKING_STORAGE_KEY, JSON.stringify([]));
+      localStorage.removeItem(MATCH_STORAGE_KEY);
+      localStorage.removeItem('math_chess_rankings_v1');
+      localStorage.removeItem('math_chess_matches_v1');
+    } catch {}
   }
   return [];
 }

@@ -246,7 +246,7 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
     setSelectedSquare(null);
   };
 
-  const currentTheme = THEME_STYLES[theme];
+  const currentTheme = (theme && THEME_STYLES[theme]) ? THEME_STYLES[theme] : THEME_STYLES.walnut;
 
   return (
     <div
