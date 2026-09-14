@@ -9,13 +9,22 @@
     <meta property="og:description" content="수학시간에 즐기는 대형 체스판 게임: AI 대전 및 1:1 대결, 참가자 이름 설정, 착수 사운드, 실시간 랭킹 시스템" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
+    <script>
+      // Ensure trailing slash for GitHub Pages project sites to avoid relative URL resolution failures
+      (function() {
+        var p = window.location.pathname;
+        if (p && !p.endsWith('/') && !p.split('/').pop().includes('.')) {
+          window.location.replace(p + '/' + window.location.search + window.location.hash);
+        }
+      })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
   </head>
   <body style="margin: 0; padding: 0; background-color: #18181b; color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
     <div id="root">
-      <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background-color: #18181b; color: #f4f4f5; text-align: center; padding: 20px;">
+      <div id="app-loading-indicator" style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background-color: #18181b; color: #f4f4f5; text-align: center; padding: 20px;">
         <div style="max-width: 360px;">
           <div style="font-size: 52px; margin-bottom: 16px; line-height: 1;">♟️</div>
           <h1 style="font-size: 19px; font-weight: 800; margin: 0 0 8px 0; letter-spacing: -0.02em;">수학 체스 (Math Chess)</h1>
@@ -34,7 +43,7 @@
             '<div style="background:#27272a;border:1px solid #3f3f46;border-radius:18px;max-width:440px;width:100%;padding:28px;box-shadow:0 20px 40px rgba(0,0,0,0.6);">' +
             '<div style="font-size:36px;margin-bottom:12px;">⚠️</div>' +
             '<h2 style="font-size:17px;font-weight:700;margin:0 0 8px 0;color:#fff;">체스 앱 실행 중 문제가 발생했습니다</h2>' +
-            '<p style="font-size:13px;color:#a1a1aa;margin:0 0 16px 0;line-height:1.5;">브라우저 저장소 캐시 충돌이 감지되었습니다. 아래 버튼을 눌러 초기화해 주세요.</p>' +
+            '<p style="font-size:13px;color:#a1a1aa;margin:0 0 16px 0;line-height:1.5;">브라우저 자바스크립트 로딩 또는 저장소 캐시 충돌이 감지되었습니다.</p>' +
             '<div style="background:#18181b;color:#f87171;padding:12px;border-radius:10px;font-family:monospace;font-size:12px;word-break:break-all;text-align:left;margin-bottom:20px;border:1px solid #3f3f46;">' +
             String(msg || '알 수 없는 로딩 오류') + '</div>' +
             '<button onclick="try{localStorage.clear();sessionStorage.clear();}catch(e){}location.reload();" style="background:#d97706;color:#fff;border:none;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;width:100%;">' +
@@ -42,12 +51,28 @@
             '</div></div>';
         }
       }
+
+      // Capture runtime script errors and network loading failures (capture phase = true)
       window.addEventListener('error', function(e) {
-        reportGlobalError(e.message || (e.error && e.error.message) || 'Script execution error');
-      });
+        if (e.target && (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK')) {
+          var src = e.target.src || e.target.href || '';
+          reportGlobalError('파일 로딩 실패 (404/네트워크 오류): ' + src);
+        } else {
+          reportGlobalError(e.message || (e.error && e.error.message) || 'Script execution error');
+        }
+      }, true);
+
       window.addEventListener('unhandledrejection', function(e) {
         reportGlobalError(e.reason && e.reason.message ? e.reason.message : 'Promise rejection error');
       });
+
+      // Watchdog: If loading indicator remains after 7s, show helper
+      setTimeout(function() {
+        var indicator = document.getElementById('app-loading-indicator');
+        if (indicator) {
+          reportGlobalError('스크립트 응답 지연: 브라우저 캐시를 새로고침하거나 아래 버튼을 클릭해 주세요.');
+        }
+      }, 7000);
     </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
